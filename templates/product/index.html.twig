@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste du matériel{% endblock %}
+
+{% block stylesheets %} 
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.21/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="../css/products.css">
+{% endblock %}
+
+{% block body %}
+
+{% for flash_message in app.session.flashbag.get('notice') %}
+<div class="alert alert-primary alert-dismissible fade show" role="alert">
+  {{flash_message}}
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+{% endfor %}
+
+<div class="container">
+  <h1 class="text-center">Liste du matériel</h1>
+  {% if products is defined %}
+    <table class="table table-striped display" id="product_table">
+        <thead>
+          <tr>
+            <th scope="col" width="90%">Nom</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for product in products %}
+            {% if product.quantity > 0 %}
+              <tr>
+                <th scope="row">{{ product.name }}</th>
+                <td>
+                  <a href="#product_popup" data-target="{{ path('product_edit', {'id': product.id} )}}" class="modal-trigger"><button class="btn btn-info" data-toggle="modal"><i class="fa fa-eye" aria-hidden="true"></i></button></a>
+                  <a href="{{ path('product_pdf', {'id': product.id} )}}"><button class="btn btn-warning"><i class="fa fa-file-pdf-o" aria-hidden="true"></i></button></a>
+                </td>
+              </tr>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+  {% endif %}
+
+  <!-- Pop-up product's details -->
+  <div class="modal fade" id="product_popup" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="exampleModalLabel">Détail du matériel</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block javascripts %}
+<script src="//cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
+<script type="text/javascript" src="//cdn.datatables.net/plug-ins/1.10.21/i18n/French.json"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#product_table').dataTable({
+          "language": {
+            "sEmptyTable":     "Aucune donnée disponible dans le tableau",
+            "sInfo":           "Affichage de l'élément _START_ à _END_ sur _TOTAL_ éléments",
+            "sInfoEmpty":      "Affichage de l'élément 0 à 0 sur 0 élément",
+            "sInfoFiltered":   "(filtré à partir de _MAX_ éléments au total)",
+            "sInfoPostFix":    "",
+            "sInfoThousands":  ",",
+            "sLengthMenu":     "Afficher _MENU_ éléments",
+            "sLoadingRecords": "Chargement...",
+            "sProcessing":     "Traitement...",
+            "sSearch":         "Rechercher :",
+            "sZeroRecords":    "Aucun élément correspondant trouvé",
+            "oPaginate": {
+                "sFirst":    "Premier",
+                "sLast":     "Dernier",
+                "sNext":     "Suivant",
+                "sPrevious": "Précédent"
+            },
+            "oAria": {
+                "sSortAscending":  ": activer pour trier la colonne par ordre croissant",
+                "sSortDescending": ": activer pour trier la colonne par ordre décroissant"
+            },
+            "select": {
+              "rows": {
+                  "_": "%d lignes sélectionnées",
+                  "0": "Aucune ligne sélectionnée",
+                  "1": "1 ligne sélectionnée"
+              } 
+            }
+          }
+        });
+
+      // Modal for product edits.
+      $('.modal-trigger').click(function () {
+        // Initialize modal
+        $('.modal').modal();
+        // Get url from <a> data-target 
+        url = $(this).attr('data-target');
+        // Ajax request 
+        $.get(url, function (data) {
+          // Add html into modal
+          $('.modal-body').html(data);
+          // Open modal
+          $('#product_popup').modal('open');
+        });    
+      })
+    });
+</script>
+{% endblock %}

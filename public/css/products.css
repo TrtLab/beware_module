@@ -1,0 +1,10 @@
+body{
+    background: url(../img/home_bg.jpg) no-repeat;
+}
+
+h1{
+    margin-top: 10%;
+    font-size: 60px;
+    color: cadetblue;
+    text-shadow: blue 2px 1px 3px;
+}
